@@ -1,0 +1,10 @@
+{
+  "description": "Enables users to perform accurate AI-powered urine test strip analysis at home via smartphone, delivering fast, secure digital health reports for patients and doctors.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
