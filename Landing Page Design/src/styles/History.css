@@ -1,0 +1,63 @@
+.history-monitor { min-height: 100vh; background: #f7f9fc; font-family: Arial, sans-serif; color: #172033; }
+.history-monitor .app { min-height: 100vh; max-width: 1280px; margin: 0 auto; padding: 28px 40px 50px; }
+.history-monitor .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.history-monitor .eyebrow { margin: 0 0 5px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #64748b; }
+.history-monitor .header h1 { margin: 0; font-family: Arial, sans-serif; font-size: 30px; line-height: 1.2; font-weight: 700; color: #111827; }
+.history-monitor .subtitle { margin: 7px 0 0; font-size: 14px; color: #64748b; }
+.history-monitor .status-badge { padding: 9px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.history-monitor .stable-badge { background: #eaf7ef; color: #16803d; }
+.history-monitor .warning-badge { background: #fff4df; color: #b85c00; }
+.history-monitor .controls { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.history-monitor .patient-control { display: flex; flex-direction: column; gap: 6px; }
+.history-monitor .patient-control label { font-size: 12px; font-weight: 700; color: #334155; }
+.history-monitor .patient-control select { width: 320px; height: 44px; padding: 0 13px; border: 1px solid #d7dee9; border-radius: 9px; background: white; color: #172033; font-size: 14px; outline: none; }
+.history-monitor .patient-control select:focus { border-color: #94a3b8; }
+.history-monitor .controls button { height: 44px; padding: 0 18px; border: none; border-radius: 9px; background: #172033; color: white; font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+.history-monitor .controls button:hover { opacity: 0.92; }
+.history-monitor .controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+.history-monitor .message { padding: 24px; border: 1px solid #e1e7ef; border-radius: 12px; background: white; text-align: center; color: #64748b; font-size: 14px; }
+.history-monitor .loading { color: #2563eb; }
+.history-monitor .error { color: #dc2626; }
+.history-monitor .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.history-monitor .stat-card { padding: 17px 20px; border: 1px solid #e0e6ef; border-radius: 12px; background: white; }
+.history-monitor .stat-card span { display: block; margin-bottom: 7px; font-size: 12px; color: #64748b; }
+.history-monitor .stat-card strong { font-size: 19px; font-weight: 700; color: #172033; }
+.history-monitor .section { margin-bottom: 20px; padding: 20px 22px; border: 1px solid #e0e6ef; border-radius: 14px; background: white; }
+.history-monitor .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.history-monitor .section-header h2 { margin: 0; font-family: Arial, sans-serif; font-size: 19px; font-weight: 700; }
+.history-monitor .section-header p { margin: 4px 0 0; font-size: 12px; color: #64748b; }
+.history-monitor .table-wrapper { overflow-x: auto; }
+.history-monitor table { width: 100%; border-collapse: collapse; }
+.history-monitor th { padding: 11px 10px; border-bottom: 1px solid #e6ebf2; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.4px; }
+.history-monitor td { padding: 13px 10px; border-bottom: 1px solid #edf1f5; font-size: 13px; color: #334155; }
+.history-monitor tbody tr:last-child td { border-bottom: none; }
+.history-monitor tbody tr:hover { background: #fafbfd; }
+.history-monitor .trend-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.history-monitor .trend-card { padding: 15px 17px; border: 1px solid #e1e7ef; border-radius: 11px; background: #fcfdff; }
+.history-monitor .trend-header { display: flex; align-items: center; justify-content: space-between; }
+.history-monitor .trend-header h3 { margin: 0; font-family: Arial, sans-serif; font-size: 14px; }
+.history-monitor .trend-header span { padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: 700; }
+.history-monitor .trend-change { background: #fff4df; color: #b85c00; }
+.history-monitor .trend-stable { background: #eaf7ef; color: #16803d; }
+.history-monitor .trend-values { margin-top: 11px; font-size: 12px; color: #64748b; }
+.history-monitor .graph { height: 250px; display: flex; align-items: end; justify-content: space-evenly; padding: 15px 20px; border: 1px solid #e1e7ef; border-radius: 11px; background: #fcfdff; }
+.history-monitor .graph-column { width: 80px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: end; }
+.history-monitor .graph-value { margin-bottom: 6px; font-size: 12px; font-weight: 700; }
+.history-monitor .graph-bar-container { width: 32px; height: 155px; display: flex; align-items: end; overflow: hidden; border-radius: 6px; background: #edf1f6; }
+.history-monitor .graph-bar { width: 100%; border-radius: 6px; background: #4f7cff; }
+.history-monitor .graph-date { margin-top: 7px; font-size: 10px; color: #64748b; text-align: center; }
+.history-monitor .summary { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; padding: 16px 18px; border-radius: 11px; }
+.history-monitor .summary-stable { background: #eaf7ef; }
+.history-monitor .summary-warning { background: #fff4df; }
+.history-monitor .summary-icon { font-size: 20px; }
+.history-monitor .summary h2 { margin: 0 0 4px; font-family: Arial, sans-serif; font-size: 15px; }
+.history-monitor .summary p { margin: 0; font-size: 12px; line-height: 1.5; color: #475569; }
+.history-monitor .updated { text-align: right; font-size: 10px; color: #94a3b8; }
+@media (max-width: 768px) {
+  .history-monitor .app { padding: 20px; }
+  .history-monitor .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .history-monitor .header h1 { font-size: 25px; }
+  .history-monitor .controls { flex-direction: column; align-items: stretch; }
+  .history-monitor .patient-control select, .history-monitor .controls button { width: 100%; }
+  .history-monitor .stats, .history-monitor .trend-grid { grid-template-columns: 1fr; }
+}
