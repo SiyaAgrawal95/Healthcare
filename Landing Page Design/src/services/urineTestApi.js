@@ -1,4 +1,52 @@
 const patientTestHistory = {
+  // DEMO PATIENT - For demonstration purposes only
+  "PAT-1000": [
+    {
+      id: "test-1000-001",
+      date: "20 Jul 2026",
+      glucose: "Negative",
+      protein: "Negative",
+      ph: 5.8,
+      ketones: "Negative",
+      blood: "Negative",
+    },
+    {
+      id: "test-1000-002",
+      date: "27 Jul 2026",
+      glucose: "Negative",
+      protein: "Trace",
+      ph: 6.0,
+      ketones: "Negative",
+      blood: "Negative",
+    },
+    {
+      id: "test-1000-003",
+      date: "03 Aug 2026",
+      glucose: "Trace",
+      protein: "Trace",
+      ph: 6.2,
+      ketones: "Negative",
+      blood: "Negative",
+    },
+    {
+      id: "test-1000-004",
+      date: "10 Aug 2026",
+      glucose: "Trace",
+      protein: "Negative",
+      ph: 6.1,
+      ketones: "Negative",
+      blood: "Trace",
+    },
+    {
+      id: "test-1000-005",
+      date: "17 Aug 2026",
+      glucose: "Moderate",
+      protein: "Trace",
+      ph: 6.4,
+      ketones: "Negative",
+      blood: "Trace",
+    },
+  ],
   "Patient 001": [
     {
       id: "test-001-001",

@@ -21,7 +21,8 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', sans-serif;
   color: #475569;
-  background: #ffffff;
+  background: linear-gradient(135deg, #EAF7FA 0%, #F8FAFC 50%, #EFF6FF 100%);
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -41,3 +42,30 @@ h1, h2, h3, h4, h5, h6, button { font-family: 'Poppins', sans-serif; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #0F4C8150; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #0F4C81; }
+
+/* Card improvements */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(15, 76, 129, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 30px rgba(15, 76, 129, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Section backgrounds */
+.section-alt {
+  background: linear-gradient(180deg, #EAF7FA 0%, #F8FAFC 100%);
+}
+
+.section-white {
+  background: white;
+}
+
+.section-tint {
+  background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
+}

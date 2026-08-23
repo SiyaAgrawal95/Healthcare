@@ -10,6 +10,12 @@ function ComparisonCard({
     return "no-change";
   };
 
+  const getCardClass = (change) => {
+    if (change === "Increased") return "card-increased";
+    if (change === "Decreased") return "card-decreased";
+    return "card-no-change";
+  };
+
   const getChangeIcon = (change) => {
     if (change === "Increased") return "↑";
     if (change === "Decreased") return "↓";
@@ -25,7 +31,7 @@ function ComparisonCard({
   };
 
   return (
-    <div className="comparison-card">
+    <div className={`comparison-card ${getCardClass(change)}`}>
       <div className="comparison-card-header">
         <h3>{parameter}</h3>
       </div>

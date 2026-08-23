@@ -1,20 +1,35 @@
-function ComparisonInsight({ parameter, earlierValue, latestValue, change }) {
+function ComparisonInsight({ comparisonData }) {
+  if (!comparisonData || comparisonData.length === 0) {
+    return null;
+  }
+
+  // Find the first parameter that changed
+  const changedItem = comparisonData.find((item) => item.change !== "No Change");
+
+  if (!changedItem) {
+    return null;
+  }
+
   const generateInsight = () => {
-    if (change === "No Change") {
-      return `${parameter} remained unchanged between the selected tests.`;
+    if (changedItem.change === "No Change") {
+      return `${changedItem.parameter} remained unchanged between the selected tests.`;
     }
 
-    const direction = change === "Increased" ? "increased" : "decreased";
-    return `${parameter} ${direction} from ${earlierValue} to ${latestValue} between the selected tests.`;
+    const direction = changedItem.change === "Increased" ? "increased" : "decreased";
+    return `${changedItem.parameter} ${direction} from ${changedItem.previous} to ${changedItem.current} between the selected tests.`;
   };
 
   return (
     <div className="comparison-insight-section">
+      <div className="section-header">
+        <h2>Key Insight</h2>
+        <p>Notable parameter change detected</p>
+      </div>
       <div className="insight-card">
         <div className="insight-icon">
-          {change === "Increased" && "↑"}
-          {change === "Decreased" && "↓"}
-          {change === "No Change" && "—"}
+          {changedItem.change === "Increased" && "↑"}
+          {changedItem.change === "Decreased" && "↓"}
+          {changedItem.change === "No Change" && "—"}
         </div>
         <div className="insight-text">
           <h3>What changed?</h3>

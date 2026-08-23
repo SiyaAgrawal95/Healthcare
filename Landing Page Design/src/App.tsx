@@ -4,6 +4,9 @@ import LandingPage from './pages/LandingPage'
 import Compare from './pages/Compare.jsx'
 import History from './pages/History'
 import ExplainResults from './pages/ExplainResults'
+import Signup from './pages/Signup.jsx'
+import Login from './pages/Login.jsx'
+import PatientDetails from './pages/PatientDetails.jsx'
 import Sidebar from './components/Sidebar'
 
 // ─── App with Routing ────────────────────────────────────────────────────────
@@ -27,6 +30,10 @@ function AppContent() {
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/patient-details" element={<PatientDetails />} />
+        <Route path="/dashboard" element={<LandingPage />} />
         <Route path="/compare" element={<Compare />} />
         <Route path="/history" element={<History />} />
         <Route path="/explain" element={<ExplainResults />} />

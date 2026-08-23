@@ -349,14 +349,35 @@
 
 .comparison-cards {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  margin-bottom: 24px;
 }
 
 .comparison-card {
-  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
   background: #F8FAFC;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
+  min-height: 260px;
+  overflow: hidden;
+}
+
+.comparison-card.card-increased {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.comparison-card.card-decreased {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.comparison-card.card-no-change {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
 }
 
 .comparison-card-header {
@@ -375,27 +396,29 @@
 }
 
 .comparison-card-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+  justify-content: center;
 }
 
 .comparison-value {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  text-align: center;
 }
 
 .comparison-value span {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .comparison-value strong {
-  font-size: 18px;
+  font-size: 16px;
   color: #1E293B;
   font-weight: 700;
 }
@@ -403,9 +426,11 @@
 .comparison-change {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15px;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
   font-weight: 700;
+  margin-top: 8px;
 }
 
 .comparison-change.increased {
@@ -421,11 +446,7 @@
 }
 
 .comparison-description {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
-  font-size: 14px;
-  color: #64748b;
+  display: none;
 }
 
 /* COMPARISON CHART SECTION */

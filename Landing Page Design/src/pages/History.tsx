@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../services/authService";
 import Header from "../components/history/Header";
-import PatientSelector from "../components/history/PatientSelector";
 import TestHistory from "../components/history/TestHistory";
 import TrendCard from "../components/history/TrendCard";
 import TrendGraph from "../components/history/TrendGraph";
@@ -9,16 +10,25 @@ import { getTestHistory } from "../services/historyUrineTestApi";
 import "../styles/History.css";
 
 export default function History() {
-  const [patient, setPatient] = useState("");
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  
   const [testHistory, setTestHistory] = useState([]);
   const [trends, setTrends] = useState([]);
   const [status, setStatus] = useState("Stable");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState("");
+  const [timePeriod, setTimePeriod] = useState("monthly");
 
-  const loadTestHistory = async () => {
-    if (!patient) {
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+    }
+  }, [currentUser, navigate]);
+
+  const loadTestHistory = useCallback(async () => {
+    if (!currentUser?.patientId) {
       setTestHistory([]);
       return;
     }
@@ -26,7 +36,7 @@ export default function History() {
     try {
       setLoading(true);
       setError("");
-      const data = await getTestHistory(patient);
+      const data = await getTestHistory(currentUser.patientId);
       setTestHistory(data);
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
@@ -34,11 +44,11 @@ export default function History() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser?.patientId]);
 
   useEffect(() => {
     loadTestHistory();
-  }, [patient]);
+  }, [loadTestHistory]);
 
   const getLevel = (value) => ({ Negative: 0, Trace: 1, Small: 1, Moderate: 2, Large: 3 }[value] ?? 0);
 
@@ -78,21 +88,78 @@ export default function History() {
 
   const changedParameters = trends.filter((trend) => trend.trend !== "Stable").map((trend) => trend.parameter);
 
+  if (!currentUser) {
+    return null;
+  }
+
+  const getFilteredTests = () => {
+    if (!testHistory || testHistory.length === 0) return [];
+    
+    const now = new Date();
+    const filtered = testHistory.filter((test) => {
+      try {
+        const testDate = new Date(test.date);
+        const daysAgo = (now.getTime() - testDate.getTime()) / (1000 * 60 * 60 * 24);
+        
+        if (timePeriod === "weekly") return daysAgo <= 7;
+        if (timePeriod === "monthly") return daysAgo <= 30;
+        if (timePeriod === "annual") return daysAgo <= 365;
+        return true;
+      } catch {
+        return true;
+      }
+    });
+    
+    return filtered.length > 0 ? filtered : testHistory;
+  };
+
+  const handleTimePeriodChange = (period) => {
+    setTimePeriod(period);
+  };
+
+  const displayedTests = getFilteredTests();
+
   return (
     <div className="history-monitor">
       <div className="app">
         <Header status={status} />
-        <PatientSelector patient={patient} setPatient={setPatient} onRefresh={loadTestHistory} loading={loading} />
-        {!patient && <div className="message">Please select a patient to view their urine test history.</div>}
-        {patient && loading && <div className="message loading">Retrieving test history...</div>}
-        {error && <div className="message error">{error}<br />Please try again.</div>}
-        {patient && !loading && !error && testHistory.length > 0 && <>
-          <div className="stats">
-            <div className="stat-card"><span>Total Tests</span><strong>{testHistory.length}</strong></div>
-            <div className="stat-card"><span>First Test</span><strong>{testHistory[0].date}</strong></div>
-            <div className="stat-card"><span>Latest Test</span><strong>{testHistory[testHistory.length - 1].date}</strong></div>
+        <div className="controls">
+          <div className="time-period-selector">
+            <label>View Period</label>
+            <div className="period-buttons">
+              <button 
+                className={timePeriod === "weekly" ? "active" : ""}
+                onClick={() => handleTimePeriodChange("weekly")}
+              >
+                Weekly
+              </button>
+              <button 
+                className={timePeriod === "monthly" ? "active" : ""}
+                onClick={() => handleTimePeriodChange("monthly")}
+              >
+                Monthly
+              </button>
+              <button 
+                className={timePeriod === "annual" ? "active" : ""}
+                onClick={() => handleTimePeriodChange("annual")}
+              >
+                Annual
+              </button>
+            </div>
           </div>
-          <TestHistory tests={testHistory} />
+          <button onClick={loadTestHistory} disabled={loading}>
+            {loading ? "Retrieving..." : "↻ Refresh History"}
+          </button>
+        </div>
+        {loading && <div className="message loading">Retrieving test history...</div>}
+        {error && <div className="message error">{error}<br />Please try again.</div>}
+        {!loading && !error && testHistory.length > 0 && <>
+          <div className="stats">
+            <div className="stat-card"><span>Total Tests ({timePeriod})</span><strong>{displayedTests.length}</strong></div>
+            <div className="stat-card"><span>First Test</span><strong>{displayedTests[0]?.date || 'N/A'}</strong></div>
+            <div className="stat-card"><span>Latest Test</span><strong>{displayedTests[displayedTests.length - 1]?.date || 'N/A'}</strong></div>
+          </div>
+          <TestHistory tests={displayedTests} />
           <section className="section">
             <div className="section-header"><div><h2>Trend Analysis</h2><p>Parameter changes across previous tests</p></div></div>
             <div className="trend-grid">{trends.map((trend) => <TrendCard key={trend.parameter} parameter={trend.parameter} values={trend.values} trend={trend.trend} />)}</div>
@@ -101,7 +168,7 @@ export default function History() {
           <MonitoringSummary status={status} changedParameters={changedParameters} />
           <div className="updated">Last Updated: {lastUpdated}</div>
         </>}
-        {patient && !loading && !error && testHistory.length === 0 && <div className="message">No previous urine tests found.</div>}
+        {currentUser && !loading && !error && testHistory.length === 0 && <div className="message">No previous urine tests found.</div>}
       </div>
     </div>
   );

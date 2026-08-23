@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const QUALITATIVE_SCALE = {
   Negative: 0,
@@ -57,13 +57,10 @@ function ComparisonChart({ earlierTest, latestTest, comparisonData }) {
   const chartData = earlierTest && latestTest ? [
     {
       name: "Earlier",
-      value: getNumericValue(earlierTest[selectedParameter], selectedParameter),
-      display: getDisplayValue(earlierTest[selectedParameter], selectedParameter),
-    },
-    {
-      name: "Latest",
-      value: getNumericValue(latestTest[selectedParameter], selectedParameter),
-      display: getDisplayValue(latestTest[selectedParameter], selectedParameter),
+      earlier: getNumericValue(earlierTest[selectedParameter], selectedParameter),
+      latest: getNumericValue(latestTest[selectedParameter], selectedParameter),
+      earlierDisplay: getDisplayValue(earlierTest[selectedParameter], selectedParameter),
+      latestDisplay: getDisplayValue(latestTest[selectedParameter], selectedParameter),
     },
   ] : [];
 
@@ -97,16 +94,21 @@ function ComparisonChart({ earlierTest, latestTest, comparisonData }) {
       {chartData.length > 0 && (
         <>
           <div className="chart-container">
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <BarChart data={chartData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis type="number" domain={selectedParameter === "ph" ? [0, 14] : [0, 4]} stroke="#64748b" />
+                <XAxis 
+                  type="number" 
+                  domain={selectedParameter === "ph" ? [0, 14] : [0, 4]} 
+                  stroke="#64748b" 
+                />
                 <YAxis type="category" dataKey="name" stroke="#64748b" width={80} />
                 <Tooltip
-                  formatter={(value, name, props) => [
-                    props.payload.display,
-                    name,
-                  ]}
+                  formatter={(value, name) => {
+                    if (name === "earlier") return [chartData[0].earlierDisplay, "Earlier"];
+                    if (name === "latest") return [chartData[0].latestDisplay, "Latest"];
+                    return [value, name];
+                  }}
                   contentStyle={{
                     backgroundColor: "#ffffff",
                     border: "1px solid #e2e8f0",
@@ -114,7 +116,13 @@ function ComparisonChart({ earlierTest, latestTest, comparisonData }) {
                     fontFamily: "Inter, sans-serif",
                   }}
                 />
-                <Bar dataKey="value" fill="#0F4C81" radius={[0, 4, 4, 0]} />
+                <Legend 
+                  verticalAlign="top" 
+                  height={36}
+                  iconType="rect"
+                />
+                <Bar dataKey="earlier" fill="#94a3b8" radius={[0, 4, 4, 0]} name="Earlier" />
+                <Bar dataKey="latest" fill="#0F4C81" radius={[0, 4, 4, 0]} name="Latest" />
               </BarChart>
             </ResponsiveContainer>
           </div>

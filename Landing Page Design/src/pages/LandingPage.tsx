@@ -225,7 +225,7 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="font-bold text-base leading-tight" style={{ fontFamily: 'Poppins, sans-serif', color: '#1E293B' }}>
-                ChromaDx<span style={{ color: '#0F4C81' }}>™</span>
+<strong>Urinex</strong><span style={{ color: '#0F4C81' }}>™</span>
               </div>
               <div className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">AI Urine Analyzer</div>
             </div>
@@ -324,7 +324,7 @@ export default function LandingPage() {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white" style={{ aspectRatio: '4/3', background: '#EAF7FA' }}>
                 <img
                   src="https://images.unsplash.com/photo-1663354876870-6282cb0a8843?w=800&h=600&fit=crop&auto=format"
-                  alt="ChromaDx AI Urine Test Strip Reader device"
+                  alt="Urinex AI Urine Test Strip Reader device"
                   className="w-full h-full object-cover"
                 />
                 {/* Overlay label */}
@@ -550,7 +550,7 @@ export default function LandingPage() {
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#0F4C81' }}>Benefits</span>
             <h2 className="text-3xl lg:text-4xl font-bold mt-3 mb-8" style={{ fontFamily: 'Poppins, sans-serif', color: '#1E293B' }}>
-              Why clinicians choose<br /><span style={{ color: '#0F4C81' }}>ChromaDx™</span>
+              Why clinicians choose<br /><span style={{ color: '#0F4C81' }}><strong>Urinex</strong>™</span>
             </h2>
             <div className="space-y-4">
               {BENEFITS.map(b => {
@@ -673,7 +673,7 @@ export default function LandingPage() {
                 Experience Faster and More<br />Accurate Urine Diagnostics
               </h2>
               <p className="text-blue-200 mb-8 max-w-xl mx-auto text-sm">
-                Schedule a live demonstration with our clinical specialists and see ChromaDx™ perform a full 10-parameter analysis in your facility.
+                Schedule a live demonstration with our clinical specialists and see <strong>Urinex</strong>™ perform a full 10-parameter analysis in your facility.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button className="px-9 py-4 rounded-xl font-bold text-[#0F4C81] bg-white hover:bg-blue-50 active:scale-95 transition-all shadow-lg text-sm">
@@ -700,7 +700,7 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <div className="font-bold text-white" style={{ fontFamily: 'Poppins' }}>ChromaDx™</div>
+                  <div className="font-bold text-white" style={{ fontFamily: 'Poppins' }}><strong>Urinex</strong>™</div>
                   <div className="text-[10px] text-slate-500 uppercase tracking-wide">AI Urine Analyzer</div>
                 </div>
               </div>
@@ -734,7 +734,7 @@ export default function LandingPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2.5">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-500"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  <span>info@chromadx.health</span>
+                  <span>info@urinex.health</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4 mt-0.5 flex-shrink-0 text-slate-500"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
@@ -748,7 +748,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-            <span>© 2026 ChromaDx Health Technologies Pvt. Ltd. All rights reserved.</span>
+            <span>© 2026 <strong>Urinex</strong> Health Technologies Pvt. Ltd. All rights reserved.</span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               CE Marked · ISO 13485 · CLIA Waived · HIPAA Compliant
