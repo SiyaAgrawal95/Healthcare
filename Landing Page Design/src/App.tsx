@@ -8,6 +8,8 @@ import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import PatientDetails from './pages/PatientDetails.jsx'
 import Sidebar from './components/Sidebar'
+import AIExplanation from "./pages/AIExplanation";
+
 
 // ─── App with Routing ────────────────────────────────────────────────────────
 function AppContent() {
@@ -37,6 +39,8 @@ function AppContent() {
         <Route path="/compare" element={<Compare />} />
         <Route path="/history" element={<History />} />
         <Route path="/explain" element={<ExplainResults />} />
+        <Route path="/ai-explanation" element={<AIExplanation />} />
+       
       </Routes>
     </>
   )

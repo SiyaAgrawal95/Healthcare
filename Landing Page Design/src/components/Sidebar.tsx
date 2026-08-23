@@ -118,6 +118,24 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </svg>
                 Explain Results
               </Link>
+              <Link
+  to="/ai-explanation"
+  onClick={onClose}
+  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all hover:bg-[#EAF7FA] hover:text-[#0F4C81]"
+  style={{ color: '#475569' }}
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="w-5 h-5"
+  >
+    <path d="M12 3a7 7 0 00-7 7c0 2.5 1.3 4.2 3 5.5V19a2 2 0 002 2h4a2 2 0 002-2v-3.5c1.7-1.3 3-3 3-5.5a7 7 0 00-7-7z" />
+    <path d="M9 19h6" />
+  </svg>
+  AI Explanation
+</Link>
             </nav>
           </div>
 
