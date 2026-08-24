@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import Compare from './pages/Compare.jsx'
 import History from './pages/History'
-import ExplainResults from './pages/ExplainResults'
 import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import PatientDetails from './pages/PatientDetails.jsx'
@@ -38,7 +37,6 @@ function AppContent() {
         <Route path="/dashboard" element={<LandingPage />} />
         <Route path="/compare" element={<Compare />} />
         <Route path="/history" element={<History />} />
-        <Route path="/explain" element={<ExplainResults />} />
         <Route path="/ai-explanation" element={<AIExplanation />} />
        
       </Routes>
