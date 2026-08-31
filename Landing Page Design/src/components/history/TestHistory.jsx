@@ -5,7 +5,7 @@ function TestHistory({ tests }) {
     <section className="section">
       <div className="section-header">
         <h2>Test History</h2>
-        <span>{tests.length} tests</span>
+        <span>{tests.length} {tests.length === 1 ? "test" : "tests"}</span>
       </div>
       {tests.length === 0 ? (
         <div className="empty">No previous urine tests found.</div>

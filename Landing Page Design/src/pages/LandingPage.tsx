@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const IconAccuracy = () => (
@@ -239,12 +240,18 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden lg:block">
-            <button
-              className="px-5 py-2.5 rounded-lg text-white text-sm font-semibold transition-all hover:opacity-90 active:scale-95 shadow-md"
-              style={{ background: 'linear-gradient(135deg, #0F4C81, #1a5a94)' }}
+            <Link
+              to="/upload-strip"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold transition-all hover:opacity-95 active:scale-95 shadow-md"
+              style={{ background: 'linear-gradient(135deg, #0F4C81 0%, #1e6bb8 100%)', boxShadow: '0 4px 14px rgba(15, 76, 129, 0.28)' }}
             >
-              Request Demo
-            </button>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-4 h-4">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Upload Test Strip
+            </Link>
           </div>
 
           <button className="lg:hidden p-2 rounded-lg hover:bg-slate-100" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -258,9 +265,19 @@ export default function LandingPage() {
             {NAV.map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileOpen(false)} className="text-sm font-medium text-slate-700 hover:text-[#0F4C81]">{l}</a>
             ))}
-            <button className="mt-1 py-3 rounded-lg text-white text-sm font-semibold" style={{ background: '#0F4C81' }}>
-              Request Demo
-            </button>
+            <Link
+              to="/upload-strip"
+              onClick={() => setMobileOpen(false)}
+              className="mt-1 py-3 rounded-lg text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md"
+              style={{ background: 'linear-gradient(135deg, #0F4C81 0%, #1e6bb8 100%)' }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-4 h-4">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Upload Test Strip
+            </Link>
           </div>
         )}
       </nav>
@@ -288,10 +305,18 @@ export default function LandingPage() {
               Accurate, fast, and reliable urine analysis using advanced colorimetric technology for Point-of-Care diagnostics in hospitals, labs, and clinics.
             </p>
             <div className="flex flex-wrap gap-4 mb-10">
-              <button className="px-7 py-3.5 rounded-xl text-white font-semibold shadow-lg transition-all hover:shadow-xl hover:opacity-95 active:scale-95"
-                style={{ background: 'linear-gradient(135deg, #0F4C81, #1a5a94)', boxShadow: '0 8px 24px #0F4C8130' }}>
-                Request Demo
-              </button>
+              <Link
+                to="/upload-strip"
+                className="px-7 py-3.5 rounded-xl text-white font-bold shadow-lg transition-all hover:shadow-xl hover:opacity-95 active:scale-95 flex items-center gap-2.5"
+                style={{ background: 'linear-gradient(135deg, #0F4C81, #1a5a94)', boxShadow: '0 8px 24px #0F4C8130' }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-5 h-5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                Upload Test Strip
+              </Link>
               <button className="px-7 py-3.5 rounded-xl font-semibold border-2 transition-all hover:bg-[#0F4C8108] active:scale-95 flex items-center gap-2"
                 style={{ borderColor: '#0F4C81', color: '#0F4C81' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><circle cx="12" cy="12" r="10" /><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none" /></svg>

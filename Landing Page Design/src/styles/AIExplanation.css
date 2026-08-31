@@ -14,7 +14,7 @@
 .ai-explanation-page .header {
   background: #ffffff;
   border-bottom: 1px solid #e5e9f2;
-  padding: 24px 45px;
+  padding: 24px 45px 24px 85px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -387,7 +387,7 @@
 
 @media (max-width: 650px) {
   .ai-explanation-page .header {
-    padding: 20px;
+    padding: 20px 20px 20px 75px;
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
