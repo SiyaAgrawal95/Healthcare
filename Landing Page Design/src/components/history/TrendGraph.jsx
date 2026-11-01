@@ -14,11 +14,11 @@ function TrendGraph({ tests }) {
 
   const chartData = tests.map((test) => ({
     date: test.date,
-    ph: typeof test.ph === "number" ? test.ph : parseFloat(test.ph) || 0,
+    ph: test.ph == null ? null : Number(test.ph),
   }));
 
   // Calculate dynamic domain with padding
-  const phValues = chartData.map((d) => d.ph).filter((v) => !isNaN(v));
+  const phValues = chartData.map((d) => d.ph).filter((v) => Number.isFinite(v));
   const minPh = phValues.length > 0 ? Math.min(...phValues) : 5;
   const maxPh = phValues.length > 0 ? Math.max(...phValues) : 8;
   const yMin = Math.max(0, Math.floor((minPh - 0.5) * 10) / 10);

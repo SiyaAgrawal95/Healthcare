@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { validateLogin, setCurrentUser, loginDemoUser } from "../services/authService";
+import { loginUser, loginDemoUser } from "../services/authService";
 import FormInput from "../components/FormInput";
 import "../styles/Auth.css";
 
@@ -63,28 +63,20 @@ function Login() {
     setIsSubmitting(true);
 
     try {
-      const result = validateLogin(formData.email, formData.password);
-      
-      if (result.success) {
-        setCurrentUser(result.user);
-        navigate("/dashboard");
-      } else {
-        setErrors({ submit: result.message });
-      }
+      await loginUser(formData.email, formData.password);
+      navigate("/dashboard");
     } catch (error) {
       setErrors({ 
-        submit: "Login failed. Please try again." 
+        submit: error.message || "Login failed. Please try again."
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDemoLogin = () => {
-    const result = loginDemoUser();
-    if (result.success) {
-      navigate("/dashboard");
-    }
+  const handleDemoLogin = async () => {
+    const result = await loginDemoUser();
+    if (!result.success) setErrors({ submit: result.message });
   };
 
   return (

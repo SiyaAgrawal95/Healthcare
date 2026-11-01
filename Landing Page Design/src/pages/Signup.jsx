@@ -118,7 +118,7 @@ function Signup() {
       }, 3000);
     } catch (error) {
       setErrors({ 
-        submit: "Failed to register. Please try again." 
+        submit: error.message || "Failed to register. Please try again."
       });
     } finally {
       setIsSubmitting(false);

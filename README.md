@@ -47,6 +47,10 @@
 
 ## 🚀 Getting Started
 
+### Backend API
+
+A Node.js/Express/MongoDB backend is available in [`backend/`](backend/README.md). Patient registration/login, profile, history, and comparison screens are connected to it. Strip image analysis and AI explanations remain demo-only and are not persisted as clinical test records.
+
 ### Prerequisites
 
 Ensure you have [Node.js](https://nodejs.org/) (version 18 or higher recommended) installed.

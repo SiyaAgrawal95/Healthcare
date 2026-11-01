@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser } from "../services/authService";
+import { getCurrentUser, getPatientProfile, setCurrentUser, updatePatientProfile } from "../services/authService";
 import FormInput from "../components/FormInput";
 import "../styles/PatientDetails.css";
 
@@ -29,8 +29,27 @@ function PatientDetails() {
   useEffect(() => {
     if (!currentUser) {
       navigate("/login");
+      return;
     }
-  }, [currentUser, navigate]);
+    getPatientProfile().then((patient) => {
+      setFormData((previous) => ({
+        ...previous,
+        patientId: patient.patientId || previous.patientId,
+        fullName: patient.fullName || previous.fullName,
+        age: patient.age == null ? "" : String(patient.age),
+        email: patient.email || previous.email,
+        phone: patient.phoneNumber || previous.phone,
+        bloodGroup: patient.bloodGroup || "",
+        gender: patient.gender || previous.gender,
+        allergies: patient.allergies || [],
+        symptoms: patient.symptoms || "",
+        testDate: patient.testDate ? patient.testDate.slice(0, 10) : "",
+        additionalNotes: patient.additionalNotes || "",
+      }));
+    }).catch((error) => {
+      setErrors((previous) => ({ ...previous, submit: error.message }));
+    });
+  }, [currentUser?._id, navigate]);
 
   const bloodGroupOptions = [
     { value: "A+", label: "A+" },
@@ -94,7 +113,7 @@ function PatientDetails() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -103,21 +122,22 @@ function PatientDetails() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const patient = await updatePatientProfile({
+        age: Number(formData.age),
+        bloodGroup: formData.bloodGroup,
+        allergies: formData.allergies,
+        symptoms: formData.symptoms,
+        testDate: formData.testDate,
+        additionalNotes: formData.additionalNotes,
+      });
+      setCurrentUser(patient);
       setSuccess(true);
+    } catch (error) {
+      setErrors((previous) => ({ ...previous, submit: error.message || "Unable to save patient details." }));
+    } finally {
       setIsSubmitting(false);
-      
-      // Store patient details in localStorage
-      try {
-        localStorage.setItem(
-          `patient_details_${formData.patientId}`,
-          JSON.stringify(formData)
-        );
-      } catch (error) {
-        console.error("Error saving patient details:", error);
-      }
-    }, 1000);
+    }
   };
 
   const handleReset = () => {
@@ -165,6 +185,7 @@ function PatientDetails() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="patient-details-form">
+            {errors.submit && <div className="error-banner">{errors.submit}</div>}
             <div className="form-section">
               <h3>Personal Information</h3>
               

@@ -1,90 +1,55 @@
-const STORAGE_KEY = "healthcare_users";
+import { apiRequest, getAuthToken, TOKEN_KEY } from "./apiClient";
+
 const CURRENT_USER_KEY = "healthcare_current_user";
 
-// DEMO PATIENT - For demonstration purposes only
-const DEMO_USER = {
-  patientId: "PAT-1000",
-  fullName: "Demo Patient",
-  email: "demo@urinex.demo",
-  password: "demo",
-  dateOfBirth: "1990-01-01",
-  gender: "prefer-not-to-say",
-  phoneNumber: "0000000000",
-  isDemo: true,
-};
+export async function saveUser(userData) {
+  const { patient } = await apiRequest("/auth/register", {
+    method: "POST",
+    auth: false,
+    body: JSON.stringify(userData),
+  });
+  return patient;
+}
 
-const getNextPatientId = () => {
-  const users = getUsers();
-  const maxId = users.reduce((max, user) => {
-    const idNum = parseInt(user.patientId.replace("PAT-", ""), 10);
-    return idNum > max ? idNum : max;
-  }, 1000);
-  return `PAT-${maxId + 1}`;
-};
+export async function loginUser(email, password) {
+  const result = await apiRequest("/auth/login", {
+    method: "POST",
+    auth: false,
+    body: JSON.stringify({ email, password }),
+  });
+  setCurrentUser(result.patient, result.token);
+  return { success: true, user: result.patient };
+}
 
-export const getUsers = () => {
-  try {
-    const users = localStorage.getItem(STORAGE_KEY);
-    return users ? JSON.parse(users) : [];
-  } catch (error) {
-    console.error("Error reading users from localStorage:", error);
-    return [];
-  }
-};
+export async function getPatientProfile() {
+  const { patient } = await apiRequest("/patients/me");
+  return patient;
+}
 
-export const saveUser = (userData) => {
-  try {
-    const users = getUsers();
-    const patientId = getNextPatientId();
-    const newUser = {
-      ...userData,
-      patientId,
-      createdAt: new Date().toISOString(),
-    };
-    users.push(newUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    return newUser;
-  } catch (error) {
-    console.error("Error saving user to localStorage:", error);
-    throw new Error("Failed to save user data");
-  }
-};
+export async function updatePatientProfile(profile) {
+  const { patient } = await apiRequest("/patients/me", {
+    method: "PATCH",
+    body: JSON.stringify(profile),
+  });
+  setCurrentUser(patient);
+  return patient;
+}
 
-export const findUserByEmail = (email) => {
-  const users = getUsers();
-  return users.find((user) => user.email === email);
-};
+export async function loginDemoUser() {
+  return {
+    success: false,
+    message: "Demo login is not connected to the database. Please create an account to continue.",
+  };
+}
 
-export const validateLogin = (email, password) => {
-  const user = findUserByEmail(email);
-  if (!user) {
-    return { success: false, message: "User not found" };
-  }
-  if (user.password !== password) {
-    return { success: false, message: "Invalid password" };
-  }
-  return { success: true, user };
-};
-
-export const loginDemoUser = () => {
-  try {
-    setCurrentUser(DEMO_USER);
-    return { success: true, user: DEMO_USER };
-  } catch (error) {
-    console.error("Error logging in demo user:", error);
-    return { success: false, message: "Failed to login demo user" };
-  }
-};
-
-export const setCurrentUser = (user) => {
-  try {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  } catch (error) {
-    console.error("Error setting current user:", error);
-  }
+export const setCurrentUser = (user, token = getAuthToken()) => {
+  if (!user || !token) return;
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  localStorage.setItem(TOKEN_KEY, token);
 };
 
 export const getCurrentUser = () => {
+  if (!getAuthToken()) return null;
   try {
     const user = localStorage.getItem(CURRENT_USER_KEY);
     return user ? JSON.parse(user) : null;
@@ -95,13 +60,8 @@ export const getCurrentUser = () => {
 };
 
 export const logout = () => {
-  try {
-    localStorage.removeItem(CURRENT_USER_KEY);
-  } catch (error) {
-    console.error("Error logging out:", error);
-  }
+  localStorage.removeItem(CURRENT_USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 };
 
-export const isAuthenticated = () => {
-  return getCurrentUser() !== null;
-};
+export const isAuthenticated = () => Boolean(getCurrentUser() && getAuthToken());

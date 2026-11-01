@@ -28,7 +28,7 @@ export default function History() {
   }, [currentUser, navigate]);
 
   const loadTestHistory = useCallback(async () => {
-    if (!currentUser?.patientId) {
+    if (!currentUser?._id) {
       setTestHistory([]);
       return;
     }
@@ -36,7 +36,7 @@ export default function History() {
     try {
       setLoading(true);
       setError("");
-      const data = await getTestHistory(currentUser.patientId);
+      const data = await getTestHistory(currentUser._id);
       setTestHistory(data);
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
@@ -44,18 +44,19 @@ export default function History() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.patientId]);
+  }, [currentUser?._id]);
 
   useEffect(() => {
     loadTestHistory();
   }, [loadTestHistory]);
 
-  const getLevel = (value) => ({ Negative: 0, Trace: 1, Small: 1, Moderate: 2, Large: 3 }[value] ?? 0);
+  const getLevel = (value) => ({ Negative: 0, Trace: 1, Small: 1, Moderate: 2, Large: 3, Positive: 1 }[value]);
 
   const calculateTrend = (values) => {
-    if (values.length < 2) return "Stable";
-    const first = values[0];
-    const last = values[values.length - 1];
+    const availableValues = values.filter((value) => value !== null && value !== undefined);
+    if (availableValues.length < 2) return "Insufficient Data";
+    const first = availableValues[0];
+    const last = availableValues[availableValues.length - 1];
     if (typeof first === "number" && typeof last === "number") {
       if (last > first) return "Increasing";
       if (last < first) return "Decreasing";
@@ -65,6 +66,7 @@ export default function History() {
     const lastLevel = getLevel(last);
     if (lastLevel > firstLevel) return "Increasing";
     if (lastLevel < firstLevel) return "Decreasing";
+    if (getLevel(first) === undefined || getLevel(last) === undefined) return "Insufficient Data";
     return "Stable";
   };
 
@@ -85,10 +87,10 @@ export default function History() {
     ];
     const calculatedTrends = parameters.map((parameter) => ({ ...parameter, parameter: parameter.name, trend: calculateTrend(parameter.values) }));
     setTrends(calculatedTrends);
-    setStatus(calculatedTrends.some((item) => item.trend !== "Stable") ? "Changes Detected" : "Stable");
+    setStatus(calculatedTrends.some((item) => ["Increasing", "Decreasing"].includes(item.trend)) ? "Changes Detected" : "Stable");
   }, [testHistory, timePeriod]);
 
-  const changedParameters = trends.filter((trend) => trend.trend !== "Stable").map((trend) => trend.parameter);
+  const changedParameters = trends.filter((trend) => ["Increasing", "Decreasing"].includes(trend.trend)).map((trend) => trend.parameter);
 
   if (!currentUser) {
     return null;

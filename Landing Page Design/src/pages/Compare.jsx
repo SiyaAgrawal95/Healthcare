@@ -13,7 +13,7 @@ function Compare() {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
   
-  const [patient, setPatient] = useState(currentUser?.patientId || "");
+  const [patient, setPatient] = useState(currentUser?._id || "");
   const [availableTests, setAvailableTests] = useState([]);
   const [earlierTest, setEarlierTest] = useState("");
   const [latestTest, setLatestTest] = useState("");
@@ -26,7 +26,7 @@ function Compare() {
     if (!currentUser) {
       navigate("/login");
     } else {
-      setPatient(currentUser.patientId);
+      setPatient(currentUser._id);
     }
   }, [currentUser, navigate]);
 
@@ -208,7 +208,7 @@ function Compare() {
           <>
             <div className="patient-info">
               <h2>{currentUser.fullName}</h2>
-              <p>Patient ID: {patient} • {availableTests.length} test records available</p>
+              <p>Patient ID: {currentUser.patientId} • {availableTests.length} test records available</p>
             </div>
 
             <div className="test-selector-section">
