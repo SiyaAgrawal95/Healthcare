@@ -8,7 +8,7 @@ import { requireAuth } from "../middleware/auth.js";
 const router = Router();
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: "draft-7", legacyHeaders: false });
 const issueToken = (patient) => jwt.sign({ sub: patient._id.toString() }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "1d" });
-const publicPatient = (patient) => ({ _id: patient._id, patientId: patient.patientId, fullName: patient.fullName, email: patient.email, dateOfBirth: patient.dateOfBirth, gender: patient.gender, phoneNumber: patient.phoneNumber, bloodGroup: patient.bloodGroup, allergies: patient.allergies });
+const publicPatient = (patient) => ({ _id: patient._id, patientId: patient.patientId, fullName: patient.fullName, email: patient.email, dateOfBirth: patient.dateOfBirth, gender: patient.gender, phoneNumber: patient.phoneNumber, bloodGroup: patient.bloodGroup, allergies: patient.allergies, isDemo: patient.isDemo });
 
 router.post("/register", authLimiter, async (req, res, next) => {
   try {

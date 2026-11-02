@@ -1,43 +1,34 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../services/authService";
+import { getPatientTestHistory } from "../services/urineTestApi";
 import "../styles/AIExplanation.css";
 
-const urineParameters = [
-  {
-    name: "Glucose",
-    value: "Trace",
-    status: "Abnormal",
-  },
-  {
-    name: "Protein",
-    value: "Negative",
-    status: "Normal",
-  },
-  {
-    name: "pH",
-    value: "6.5",
-    status: "Normal",
-  },
-  {
-    name: "Ketones",
-    value: "Moderate",
-    status: "Abnormal",
-  },
-  {
-    name: "Blood",
-    value: "Negative",
-    status: "Normal",
-  },
-  {
-    name: "Nitrite",
-    value: "Positive",
-    status: "Abnormal",
-  },
-  {
-    name: "Leukocytes",
-    value: "Trace",
-    status: "Abnormal",
-  },
-];
+const PARAMETER_LABELS = {
+  glucose: "Glucose",
+  protein: "Protein",
+  ph: "pH",
+  ketones: "Ketones",
+  blood: "Blood",
+  nitrite: "Nitrite",
+  leukocytes: "Leukocytes",
+  specificGravity: "Specific Gravity",
+  bilirubin: "Bilirubin",
+  urobilinogen: "Urobilinogen",
+};
+
+const formatParameter = (parameter) => {
+  const rawValue = parameter.value;
+  const value = typeof rawValue === "string"
+    ? rawValue.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+    : String(rawValue);
+  const statusLabels = { normal: "Normal", abnormal: "Abnormal", borderline: "Borderline", not_readable: "Not Readable" };
+  return {
+    name: PARAMETER_LABELS[parameter.name] || parameter.name,
+    value: parameter.unit ? `${value} ${parameter.unit}` : value,
+    status: statusLabels[parameter.status] || "Not Readable",
+  };
+};
 
 const explanationData = {
   Glucose: {
@@ -99,24 +90,57 @@ function getExplanation(parameter) {
       resolve({
         name: parameter.name,
         value: parameter.value,
-        ...explanationData[parameter.name],
+        ...(explanationData[parameter.name] || {
+          explanation: `${parameter.name} should be interpreted using the reference ranges for the specific test strip and the rest of the test results.`,
+          factors: ["Strip manufacturer reference ranges", "Sample handling and timing", "Other clinical context"],
+          guidance: "This educational summary is not a diagnosis. Discuss persistent or concerning findings with a healthcare professional.",
+        }),
       });
     }, 1200);
   });
 }
 
 function App() {
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const [testRecord, setTestRecord] = useState(null);
+  const [urineParameters, setUrineParameters] = useState([]);
   const [selectedParameter, setSelectedParameter] = useState(null);
   const [explanation, setExplanation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [testLoading, setTestLoading] = useState(true);
 
-  const abnormalParameters = urineParameters.filter(
-    (parameter) => parameter.status === "Abnormal"
-  );
+  const abnormalParameters = urineParameters.filter((parameter) => ["Abnormal", "Borderline"].includes(parameter.status));
+
+  useEffect(() => {
+    if (!currentUser?._id) {
+      navigate("/login");
+      return;
+    }
+    let cancelled = false;
+    const loadLatestTest = async () => {
+      setTestLoading(true);
+      setError("");
+      try {
+        const tests = await getPatientTestHistory(currentUser._id);
+        if (cancelled) return;
+        const latest = tests.at(-1) || null;
+        setTestRecord(latest);
+        const parameters = (latest?.parameters || []).map(formatParameter);
+        setUrineParameters(parameters);
+        setSelectedParameter(parameters.find((item) => ["Abnormal", "Borderline"].includes(item.status)) || null);
+      } catch (loadError) {
+        if (!cancelled) setError(loadError.message || "Unable to load saved urine test results.");
+      } finally {
+        if (!cancelled) setTestLoading(false);
+      }
+    };
+    loadLatestTest();
+    return () => { cancelled = true; };
+  }, [currentUser?._id, navigate]);
 
   const loadExplanation = async (parameter) => {
-    setSelectedParameter(parameter);
     setExplanation(null);
     setError("");
     setLoading(true);
@@ -132,74 +156,86 @@ function App() {
   };
 
   useEffect(() => {
-    loadExplanation(abnormalParameters[0]);
-  }, []);
+    if (selectedParameter) loadExplanation(selectedParameter);
+    else setExplanation(null);
+  }, [selectedParameter]);
 
   return (
     <div className="ai-explanation-page">
       {/* HEADER */}
       <header className="header">
         <div>
-          <h1>AI Urine Result Explanation System</h1>
-          <p>AI-Assisted Abnormal Parameter Analysis</p>
+          <h1>Urine Test Result Explanation</h1>
+          <p>Educational context for your latest saved test</p>
         </div>
 
         <div className="status">
           <span className="status-dot"></span>
-          AI Analysis Active
+          {testRecord?.source === "demo" ? "Synthetic Demo Record" : "Saved Test Record"}
         </div>
       </header>
 
       {/* PATIENT INFO */}
-      <section className="patient-card">
+      {testRecord && <section className="patient-card">
         <div>
           <span>Patient ID</span>
-          <strong>P001</strong>
+          <strong>{currentUser?.patientId || "—"}</strong>
         </div>
 
         <div>
           <span>Patient Name</span>
-          <strong>Sample Patient</strong>
+          <strong>{currentUser?.fullName || "—"}</strong>
         </div>
 
         <div>
           <span>Test Date</span>
-          <strong>17/08/2026</strong>
+          <strong>{testRecord.date}</strong>
         </div>
 
         <div>
           <span>Analysis Status</span>
-          <strong className="abnormal-text">Abnormal Findings</strong>
+          <strong>{testRecord.analysis?.status || "pending"}</strong>
         </div>
-      </section>
+      </section>}
+
+      {testLoading && <div className="loading"><div className="spinner"></div><p>Loading saved test results...</p></div>}
+      {!testLoading && error && <div className="error" role="alert">{error}</div>}
+      {!testLoading && !error && !testRecord && (
+        <div className="empty-state">
+          <h2>No saved urine test yet</h2>
+          <p>Upload a strip and save a test record before viewing its explanation.</p>
+        </div>
+      )}
 
       {/* RESULTS */}
-      <section className="section">
+      {testRecord && <section className="section">
         <div className="section-title">
           <div>
             <h2>Urine Test Results</h2>
-            <p>AI-generated urine analysis parameters</p>
+            <p>Values loaded from your latest MongoDB test record</p>
           </div>
 
           <span className="count">
-            {abnormalParameters.length} Abnormal
+            {abnormalParameters.length} Abnormal or Borderline
           </span>
         </div>
+
+        {testRecord.analysis?.summary && <div className="error" role="note">{testRecord.analysis.summary}</div>}
 
         <div className="result-grid">
           {urineParameters.map((parameter) => (
             <div
               key={parameter.name}
               className={`parameter-card ${
-                parameter.status === "Abnormal" ? "abnormal-card" : ""
+                ["Abnormal", "Borderline"].includes(parameter.status) ? "abnormal-card" : ""
               } ${
                 selectedParameter?.name === parameter.name
                   ? "selected-card"
                   : ""
               }`}
               onClick={() =>
-                parameter.status === "Abnormal" &&
-                loadExplanation(parameter)
+                ["Abnormal", "Borderline"].includes(parameter.status) &&
+                setSelectedParameter(parameter)
               }
             >
               <div className="parameter-top">
@@ -207,7 +243,7 @@ function App() {
 
                 <span
                   className={`badge ${
-                    parameter.status === "Abnormal"
+                    ["Abnormal", "Borderline"].includes(parameter.status)
                       ? "badge-abnormal"
                       : "badge-normal"
                   }`}
@@ -218,19 +254,19 @@ function App() {
 
               <div className="parameter-value">{parameter.value}</div>
 
-              {parameter.status === "Abnormal" && (
+              {["Abnormal", "Borderline"].includes(parameter.status) && (
                 <span className="click-text">Click to explain →</span>
               )}
             </div>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* SELECTOR */}
-      <section className="selector-section">
+      {testRecord && abnormalParameters.length > 0 && <section className="selector-section">
         <div>
           <h2>Select an Abnormal Parameter</h2>
-          <p>Choose an abnormal result to view its AI-assisted explanation.</p>
+          <p>Choose an abnormal or borderline result to view educational context.</p>
         </div>
 
         <select
@@ -241,7 +277,7 @@ function App() {
             );
 
             if (parameter) {
-              loadExplanation(parameter);
+              setSelectedParameter(parameter);
             }
           }}
         >
@@ -255,7 +291,8 @@ function App() {
             </option>
           ))}
         </select>
-      </section>
+      </section>}
+      {testRecord && abnormalParameters.length === 0 && <div className="empty-state">No abnormal or borderline parameters are recorded for this test.</div>}
 
       {/* EXPLANATION */}
       {selectedParameter && (
@@ -263,14 +300,14 @@ function App() {
           <div className="section-title">
             <div>
               <h2>Parameter Explanation</h2>
-              <p>Educational information based on the selected result</p>
+              <p>Static educational guidance based on the selected saved result</p>
             </div>
           </div>
 
           {loading && (
             <div className="loading">
               <div className="spinner"></div>
-              <p>Loading AI explanation...</p>
+              <p>Loading educational reference...</p>
             </div>
           )}
 

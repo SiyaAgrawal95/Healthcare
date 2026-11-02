@@ -76,7 +76,8 @@ function Login() {
 
   const handleDemoLogin = async () => {
     const result = await loginDemoUser();
-    if (!result.success) setErrors({ submit: result.message });
+    if (result.success) navigate("/dashboard");
+    else setErrors({ submit: result.message });
   };
 
   return (

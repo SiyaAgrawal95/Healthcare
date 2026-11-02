@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { getCurrentUser } from '../services/authService'
+import { saveUrineTest } from '../services/urineTestApi'
 import '../styles/UploadStrip.css'
 
 interface DetectedParam {
@@ -66,20 +68,30 @@ const BIOMARKERS_INFO = [
 ]
 
 export default function UploadStrip() {
+  const navigate = useNavigate()
+  const currentUser = getCurrentUser()
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string>('')
   const [isScanning, setIsScanning] = useState<boolean>(false)
   const [scanProgress, setScanProgress] = useState<number>(0)
   const [scanStatusText, setScanStatusText] = useState<string>('')
   const [results, setResults] = useState<DetectedParam[] | null>(null)
+  const [savedTestId, setSavedTestId] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string>('')
   const [isDragOver, setIsDragOver] = useState<boolean>(false)
   const [activeInfoTab, setActiveInfoTab] = useState<'guidelines' | 'biomarkers' | 'tech'>('guidelines')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!currentUser?._id) navigate('/login')
+  }, [currentUser?._id, navigate])
 
   const handleFileUpload = (file: File) => {
     if (!file) return
     setFileName(file.name)
     setResults(null)
+    setSavedTestId(null)
+    setSaveError('')
     const reader = new FileReader()
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -105,6 +117,8 @@ export default function UploadStrip() {
 
   const loadSample = (type: 'normal' | 'abnormal') => {
     setResults(null)
+    setSavedTestId(null)
+    setSaveError('')
     if (type === 'normal') {
       setImageSrc(SAMPLE_NORMAL_STRIP)
       setFileName('Sample_Normal_Strip_10SG.jpg')
@@ -114,38 +128,79 @@ export default function UploadStrip() {
     }
   }
 
-  const runAnalysis = () => {
-    if (!imageSrc) return
-    setIsScanning(true)
-    setScanProgress(15)
-    setScanStatusText('Detecting test strip alignment & reagent pads...')
-
-    setTimeout(() => {
-      setScanProgress(50)
-      setScanStatusText('Calibrating CIE L*a*b* optical coordinates against white balance...')
-    }, 700)
-
-    setTimeout(() => {
-      setScanProgress(85)
-      setScanStatusText('Quantifying biomarker reactions...')
-    }, 1400)
-
-    setTimeout(() => {
-      setScanProgress(100)
-      setScanStatusText('Analysis complete!')
-      setIsScanning(false)
-      if (fileName.toLowerCase().includes('abnormal')) {
-        setResults(ABNORMAL_RESULTS)
-      } else {
-        setResults(NORMAL_RESULTS)
+  const buildDemoPayload = (detected: DetectedParam[]) => {
+    const parameterNames: Record<string, string> = {
+      'Glucose': 'glucose', 'Protein': 'protein', 'pH': 'ph', 'Ketones': 'ketones',
+      'Blood': 'blood', 'Nitrite': 'nitrite', 'Leukocytes': 'leukocytes',
+      'Spec. Gravity': 'specificGravity', 'Bilirubin': 'bilirubin', 'Urobilinogen': 'urobilinogen',
+    }
+    const numericNames = new Set(['pH', 'Spec. Gravity', 'Urobilinogen'])
+    const units: Record<string, string> = { 'pH': 'pH', 'Spec. Gravity': 'specific gravity', 'Urobilinogen': 'mg/dL' }
+    const parameters = detected.map((item) => {
+      const numeric = numericNames.has(item.name)
+      const value = numeric ? Number.parseFloat(item.value) : item.value.toLowerCase()
+      return {
+        name: parameterNames[item.name],
+        value,
+        status: item.status.toLowerCase(),
+        ...(units[item.name] ? { unit: units[item.name] } : {}),
+        ...(!numeric ? { interpretation: value } : {}),
       }
-    }, 2000)
+    })
+    const flags = detected.filter((item) => item.status === 'Abnormal').map((item) => `${item.name}: ${item.value}`)
+    return {
+      observedAt: new Date().toISOString(),
+      source: 'demo',
+      stripManufacturer: 'Unspecified demo strip',
+      parameters,
+      analysis: {
+        status: 'complete',
+        summary: 'SIMULATED DEMO OUTPUT. The uploaded image was not analyzed by a colorimetry model.',
+        flags,
+        recommendations: [],
+        modelName: 'frontend-demo-simulator',
+        modelVersion: '1.0',
+        analyzedAt: new Date().toISOString(),
+      },
+      notes: 'Synthetic preview record only. Not measured from the uploaded image and not for clinical use.',
+    }
+  }
+
+  const runAnalysis = async () => {
+    if (!imageSrc || isScanning || !currentUser?._id) return
+    setIsScanning(true)
+    setSaveError('')
+    setSavedTestId(null)
+    setScanProgress(15)
+    setScanStatusText('Preparing the uploaded image for a demo run...')
+    const pause = (duration: number) => new Promise((resolve) => setTimeout(resolve, duration))
+    try {
+      await pause(500)
+      setScanProgress(50)
+      setScanStatusText('Generating a preset demo result...')
+      await pause(500)
+      const detected = fileName.toLowerCase().includes('abnormal') ? ABNORMAL_RESULTS : NORMAL_RESULTS
+      setResults(detected)
+      setScanProgress(85)
+      setScanStatusText('Saving the demo observation to your test history...')
+      const savedTest = await saveUrineTest(currentUser._id, buildDemoPayload(detected))
+      setSavedTestId(savedTest.id)
+      setScanProgress(100)
+      setScanStatusText('Demo result saved to your test history.')
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Unable to save the demo result.')
+      setScanStatusText('Could not save the demo result.')
+    } finally {
+      setIsScanning(false)
+    }
   }
 
   const clearImage = () => {
     setImageSrc(null)
     setFileName('')
     setResults(null)
+    setSavedTestId(null)
+    setSaveError('')
     setIsScanning(false)
     setScanProgress(0)
     if (fileInputRef.current) {
@@ -155,6 +210,8 @@ export default function UploadStrip() {
 
   const abnormalCount = results ? results.filter(r => r.status === 'Abnormal').length : 0
 
+  if (!currentUser) return null
+
   return (
     <div className="upload-strip-page">
       {/* Header */}
@@ -163,12 +220,11 @@ export default function UploadStrip() {
           <p className="eyebrow">AI OPTICAL COLORIMETRIC SCANNER</p>
           <h1>Upload Urine Test Strip</h1>
           <p>
-            Capture or upload a clear photo of your 10-parameter urine test strip for instant AI analysis and clinical biomarker reading.
+            Upload a strip image to create a clearly labeled demo record. Real image colorimetry is not connected yet.
           </p>
         </div>
         <div className="tech-badge">
-          <span className="pulse-dot"></span>
-          Neural Optical Scanner Active
+          Demo mode
         </div>
       </header>
 
@@ -262,7 +318,7 @@ export default function UploadStrip() {
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 8v8M8 12h8" />
                     </svg>
-                    {results ? 'Re-Analyze Strip' : 'Scan & Analyze Strip with AI'}
+                    {results ? 'Generate Another Demo Result' : 'Generate & Save Demo Result'}
                   </button>
                   <button type="button" className="action-btn-clear" onClick={clearImage}>
                     Change Image
@@ -275,13 +331,16 @@ export default function UploadStrip() {
                 <div className={`results-card ${abnormalCount > 0 ? 'has-abnormal' : ''}`}>
                   <div className="results-header">
                     <div>
-                      <h3>Detected Biomarker Readings</h3>
+                      <h3>Simulated Demo Readings</h3>
                       <span style={{ fontSize: '12px', color: abnormalCount > 0 ? '#dc2626' : '#16a34a', fontWeight: 600 }}>
                         {abnormalCount > 0 ? `⚠️ ${abnormalCount} Abnormal Finding(s) Detected` : '✓ All 10 Parameters in Normal Range'}
                       </span>
                     </div>
-                    <span className="results-confidence">98.6% Optical Match</span>
+                    {savedTestId && <span className="results-confidence">Saved to MongoDB</span>}
                   </div>
+
+                  <p className="demo-disclaimer">These preset values were not measured from the uploaded image. They are saved as synthetic demo data, not clinical results.</p>
+                  {saveError && <div className="error-banner" role="alert">Result was not saved: {saveError}</div>}
 
                   <div className="parameters-grid">
                     {results.map((param) => (

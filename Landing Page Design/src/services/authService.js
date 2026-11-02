@@ -27,19 +27,36 @@ export async function getPatientProfile() {
 }
 
 export async function updatePatientProfile(profile) {
-  const { patient } = await apiRequest("/patients/me", {
+  await apiRequest("/patients/me", {
     method: "PATCH",
     body: JSON.stringify(profile),
   });
+
+  // Read the profile back from MongoDB before the UI reports a successful save.
+  const { patient } = await apiRequest("/patients/me");
+  const persisted = Object.entries(profile).every(([key, value]) => {
+    const actual = patient[key];
+    if (Array.isArray(value)) return JSON.stringify(actual) === JSON.stringify(value);
+    if (key === "testDate" && value && actual) {
+      return new Date(actual).toISOString().slice(0, 10) === new Date(value).toISOString().slice(0, 10);
+    }
+    return actual === value;
+  });
+
+  if (!persisted) {
+    throw new Error("The profile update could not be confirmed in the database. Please try again.");
+  }
+
   setCurrentUser(patient);
   return patient;
 }
 
 export async function loginDemoUser() {
-  return {
-    success: false,
-    message: "Demo login is not connected to the database. Please create an account to continue.",
-  };
+  try {
+    return await loginUser("demo@urinex.local", "DemoPass123!");
+  } catch (error) {
+    return { success: false, message: error.message || "Unable to sign in to the demo account." };
+  }
 }
 
 export const setCurrentUser = (user, token = getAuthToken()) => {

@@ -65,7 +65,7 @@ const urineTestSchema = new mongoose.Schema({
   },
   analysis: { type: analysisSchema, default: () => ({}) },
   notes: { type: String, trim: true, maxlength: 2000 },
-  source: { type: String, enum: ["manual", "image", "device"], default: "manual" },
+  source: { type: String, enum: ["manual", "image", "device", "demo"], default: "manual" },
 }, { timestamps: true });
 
 urineTestSchema.index({ patient: 1, observedAt: -1 });

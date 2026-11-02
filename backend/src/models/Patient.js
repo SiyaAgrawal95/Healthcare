@@ -14,6 +14,7 @@ const patientSchema = new mongoose.Schema({
   symptoms: { type: String, trim: true, maxlength: 2000 },
   testDate: Date,
   additionalNotes: { type: String, trim: true, maxlength: 2000 },
+  isDemo: { type: Boolean, default: false, index: true },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true, toJSON: { transform: (_doc, ret) => { delete ret.passwordHash; delete ret.__v; return ret; } } });
 

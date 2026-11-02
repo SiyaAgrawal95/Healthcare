@@ -30,6 +30,8 @@ export function normalizeTest(test) {
     testId: test._id,
     date,
     observedAt,
+    source: test.source,
+    notes: test.notes,
     glucose: values.glucose ?? null,
     protein: values.protein ?? null,
     ph: values.ph == null || !Number.isFinite(Number(values.ph)) ? null : Number(values.ph),

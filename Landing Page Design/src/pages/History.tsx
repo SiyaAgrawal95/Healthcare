@@ -180,6 +180,7 @@ export default function History() {
         {loading && <div className="message loading">Retrieving test history...</div>}
         {error && <div className="message error">{error}<br />Please try again.</div>}
         {!loading && !error && testHistory.length > 0 && <>
+          {testHistory.some((test) => test.source === "demo") && <div className="message">Synthetic demo records are included. They are not clinical readings.</div>}
           <div className="stats">
             <div className="stat-card"><span>Total Tests ({timePeriod})</span><strong>{displayedTests.length}</strong></div>
             <div className="stat-card"><span>First Test</span><strong>{displayedTests[0]?.date || 'N/A'}</strong></div>

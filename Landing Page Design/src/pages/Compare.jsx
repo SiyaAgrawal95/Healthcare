@@ -209,6 +209,7 @@ function Compare() {
             <div className="patient-info">
               <h2>{currentUser.fullName}</h2>
               <p>Patient ID: {currentUser.patientId} • {availableTests.length} test records available</p>
+              {availableTests.some((test) => test.source === "demo") && <p>Synthetic demo values are included and are not clinical readings.</p>}
             </div>
 
             <div className="test-selector-section">

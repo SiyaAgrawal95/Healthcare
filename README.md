@@ -49,7 +49,7 @@
 
 ### Backend API
 
-A Node.js/Express/MongoDB backend is available in [`backend/`](backend/README.md). Patient registration/login, profile, history, and comparison screens are connected to it. Strip image analysis and AI explanations remain demo-only and are not persisted as clinical test records.
+A Node.js/Express/MongoDB backend is available in [`backend/`](backend/README.md). Patient registration/login, profile, upload results, history, and comparisons are connected to it. Upload results are saved as clearly labeled synthetic demo readings; actual image colorimetry and AI-generated explanations are not implemented yet.
 
 ### Prerequisites
 
